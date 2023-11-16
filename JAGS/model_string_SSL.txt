@@ -1,0 +1,33 @@
+model {
+  # -----------------
+  # Likelihood
+  # -----------------
+  for (i in 1:N) { 
+    y[i] ~ dnorm(mu[i], prec)  
+    mu[i] <- beta0+sum(beta[] * X[i,]) 
+  }
+	
+  # Priors for beta
+  for (i in 1:p) {  
+    # Prior for gamma
+    gamma[i] ~ dbern(theta)  # Binary variable following Bernoulli distribution. This can be used for variable selection.
+
+    # Auxiliary variables for Laplace prior
+    V[i] ~ dexp(1)  # exponential distribution, used for reparameterization of Laplace prior
+    Z[i] ~ dnorm(0, 1)  # standard normal distribution, used for reparameterization of Laplace prior
+
+    # Definition of lambda
+    lambda[i] <- gamma[i] * lambda1 + (1 - gamma[i]) * lambda0  # Mixing two lambda values based on gamma, which can allow a form of variable selection
+
+    # Prior for beta
+    beta[i] <-(lambda[i]^2/2) * sqrt(2 * V[i]) * Z[i]  # Definition of beta, given the previous parameters (Laplace prior)
+  }
+
+  theta ~ dbeta(a, b)  # Prior for the Bernoulli parameter (Beta distribution)
+  beta0 ~ dnorm(0, 0.01)  # Prior for the intercept of the model
+
+  # Prior for precision (1 / sigma^2)
+  prec ~ dgamma(alpha, beta_prec)  # Precision follows a gamma distribution
+  sigma_sq <- 1 / prec  # Definition of sigma squared (variance) as the reciprocal of precision
+  
+}

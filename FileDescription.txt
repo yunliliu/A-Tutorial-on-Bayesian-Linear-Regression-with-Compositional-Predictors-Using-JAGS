@@ -1,0 +1,11 @@
+Manuscript: Yunli Liu, Tong X, Jia Di
+
+Written by: Tong X and lily
+Edited by: Bandyopadhyay D
+
+Last edited: 11/28/2023
+
+
+Below are the steps (and corresponding files) for generating simulated data, fitting the models, and summarizing findings
+
+Step 0 [00_data_generation.R]: Generating datasets.

@@ -1,0 +1,19 @@
+model {
+  # Priors
+  mu ~ dnorm(0, 1.0E-6);  # Weakly informative Normal prior for the intercept mu
+
+  nu ~ dgamma(2, 0.1);  # Gamma prior for nu. The rate parameter of Gamma is fixed at 0.1 and shape parameter at 2.
+  sigma <- 1/nu  # Transform nu to sigma as JAGS uses precision (1/sigma^2)
+
+  for (j in 1:p) {
+    # Using the scale mixture representation of the Laplace distribution:
+    tau_sq[j] ~ dexp(lambda^2 / 2);  # follows an exponential distribution with rate lambda^2 / 2
+    beta[j] ~ dnorm(0, 1/(sigma^2 * tau_sq[j])); 
+  }
+
+  # Likelihood
+  for (i in 1:N) {
+    y_hat[i] = mu + sum(Z[i,] * beta);  # model for the mean
+    y[i] ~ dnorm(y_hat[i], 1/sigma^2);  # normal distribution for y
+  }
+}
